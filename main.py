@@ -42,7 +42,7 @@ def on_space():
 def on_lkm():
     pyautogui.click(button="left")
 
-def main():
+def strelki():
     put_markdown("## Управление стрелками")
     # Размещаем кнопки в виде крестовины
     put_row([
@@ -69,17 +69,17 @@ def main():
         None
     ], size="50px 50px 50px")
     
+    
+
+def main():   
     put_row([
-        put_button("esc", onclick=on_esc),
-        put_button("space", onclick=on_space),
-        put_button("LMOUSE", onclick=on_lkm),
-        put_button("enter", onclick=on_enter)
-    ], size="50px 69px 67px")
-
+            put_button("strelki", onclick=strelki),
+            put_button("esc", onclick=on_esc),
+            put_button("space", onclick=on_space),
+            put_button("LMOUSE", onclick=on_lkm),
+            put_button("enter", onclick=on_enter)
+        ], size="50px 69px 67px")
     put_text("Нажимайте кнопки – они эмулируют нажатие клавиш на вашем компьютере.")
-
-
-
 
 if __name__ == '__main__':
     start_server(main, port=1337)  # передаём функцию, а не результат
