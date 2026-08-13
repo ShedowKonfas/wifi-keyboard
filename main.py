@@ -2,84 +2,87 @@ from pywebio import start_server
 from pywebio.output import put_button, put_row, put_text, put_markdown
 from pywebio.session import run_js
 import pyautogui
+import time
 
-def refresh():
-    put_button("↻", onclick=lambda: run_js('window.location.reload()'))
+# Универсальная функция для нажатия клавиш
+def on(key):
+    pyautogui.keyDown(key)
+    time.sleep(0.5)
+    pyautogui.keyUp(key)
+    put_text(f"Нажата клавиша: {key}")
 
+# Отдельно для клика мышью (т.к. это не press)
+def on_mouse(btn):
+    pyautogui.click(button=btn)
+    if btn == "left":
+        put_text("Клик левой кнопкой мыши")
+    elif btn == "right":
+        put_text("Клик правой кнопкой мыши")
+    elif btn == "middle":
+        put_text("Клик средней кнопкой мыши")
+    else :
+        put_text("Ты че вообще жмешь?")
+   
 
-def on_up():
-    pyautogui.press('up')
-    put_text("Нажата стрелка вверх")  # визуальная обратная связь
-
-def on_down():
-    pyautogui.press('down')
-    put_text("Нажата стрелка вниз")
-
-def on_left():
-    pyautogui.press('left')
-    put_text("Нажата стрелка влево")
-
-def on_right():
-    pyautogui.press('right')
-    put_text("Нажата стрелка вправо")
-
-def on_pause():
-    pyautogui.press('playpause')
-    put_text("Нажата стрелка пауза")
-
-def on_esc():
-    pyautogui.press('escape')
-    put_text("Нажата стрелка esc")
-
-def on_enter():
-    pyautogui.press('Enter')
-    put_text("Нажата стрелка enter")
-
-def on_space():
-    pyautogui.press('space')
-    put_text("Нажата стрелка enter")
-
-def on_lkm():
-    pyautogui.click(button="left")
+# Кнопка обновления страницы (вынесена для повторного использования)
+def refresh_btn():
+    return put_button("↻", onclick=lambda: run_js('window.location.reload()'))
 
 def strelki():
     put_markdown("## Управление стрелками")
-    # Размещаем кнопки в виде крестовины
+    # Крестовина стрелок + кнопка паузы и обновления
     put_row([
-        None,  # пустота в левом верхнем углу
-        put_button("↑", onclick=on_up),
+        None,
+        put_button("↑", onclick=lambda: on("up")),
         None
-    ], size="50px 50px 50px")  # размеры колонок
+    ], size="50px 50px 50px")
 
     put_row([
-        put_button("←", onclick=on_left),
-        put_button("⏯", onclick=on_pause),  # можно любую кнопку
-        put_button("→", onclick=on_right)
+        put_button("←", onclick=lambda: on("left")),
+        put_button("⏯", onclick=lambda: on("playpause")),   # пауза/воспроизведение
+        put_button("→", onclick=lambda: on("right"))
     ], size="50px 50px 50px")
 
     put_row([
         None,
-        put_button("↓", onclick=on_down),
+        put_button("↓", onclick=lambda: on("down")),
         None
     ], size="50px 50px 50px")
 
     put_row([
         None,
-        put_button("↻", onclick=lambda: run_js('window.location.reload()')),
+        refresh_btn(),   # кнопка обновления
         None
     ], size="50px 50px 50px")
-    
-    
 
-def main():   
+#def player():
+
+
+def main():
+    # Главная панель с кнопками
     put_row([
-            put_button("strelki", onclick=strelki),
-            put_button("esc", onclick=on_esc),
-            put_button("space", onclick=on_space),
-            put_button("LMOUSE", onclick=on_lkm),
-            put_button("enter", onclick=on_enter)
-        ], size="50px 69px 67px")
+         ### MOUSE ###
+        put_text("MOUSE"),
+        put_button("ЛКМ", onclick=lambda: on_mouse("left")),
+        put_button("ПКМ", onclick=lambda: on_mouse("right")),
+        put_button("СКМ", onclick=lambda: on_mouse("middle"))
+    ], size="auto")
+    put_row([
+        ### KEYBOARD ###
+        put_text("KEYBOARD"),
+        put_button("Esc", onclick=lambda: on("esc")),
+        put_button("Space", onclick=lambda: on("space")),
+        put_button("Enter", onclick=lambda: on("enter"))
+    ], size="auto")
+    put_row([
+        ### MENU ###
+        put_text("MENU"),
+        put_button("Стрелки", onclick=strelki),
+        #put_button("Управление плеером", onclick=player),
+        put_button("Refresh", onclick=refresh_btn)   # можно и сюда добавить обновление
+    ], size="auto")
+
     put_text("Нажимайте кнопки – они эмулируют нажатие клавиш на вашем компьютере.")
 
 if __name__ == '__main__':
-    start_server(main, port=1337)  # передаём функцию, а не результат
+    start_server(main, port=1337)
